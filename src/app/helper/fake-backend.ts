@@ -15,35 +15,28 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
     const { url, method, headers, body } = request;
 
-    this.handleRoute (request.url, request.method, request.body, request, next);
-
-    
-  }
-  handleRoute(url, method, body, request, next){
-    switch (true){
+    function handleRoute (url, method){
+      switch (true){
       case url.endsWith('/auth/login') && method === 'POST':
-      return this.authenticate(body);
-      break;
-      default:
-       return next.handle(request);
-    }
-  }
-  authenticate(body){
-      const { email, password } = body;
-            const user = users.find(x => x.username === email && x.password === password);
+      function authenticate(body){
+       const { email, password } = body; 
+       const user = users.find(x => x.username === email && x.password === password);
             if (!user){ 
             console.log('Username or password is incorrect');
             return false;
             }
-              this.yes({
-                    id: user.id,
+            function yes(body){
+                  body = {id: user.id,
                     username: user.username,
-                    token: `fake-jwt-token`
-                });
+                    token: `fake-jwt-token`}
+                  return of(new HttpResponse({status:200, body}));
+            }
+      }
+      break;
+      default:
+      return next.handle(request);
+    }
+    };
 
-
+    }
   }
-  yes(body){
-      return of(new HttpResponse({status: 200, body}));
-  }
-}

@@ -19,10 +19,10 @@ private userSubject: BehaviorSubject<User>;
   }
 
   login(email:string, password:string) {
-    return this.httpClient.post<any>('http://www.your-server.com/auth/login', {email, password}).pipe(map(user => {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                this.userSubject.next(user);
-                return user;
+    return this.httpClient.post<any>('http://www.your-server.com/auth/login', {email, password}).pipe(map(res => {
+                localStorage.setItem('currentUser', JSON.stringify(res));
+                this.userSubject.next(res);
+                return res;
             }));
     }
 }
