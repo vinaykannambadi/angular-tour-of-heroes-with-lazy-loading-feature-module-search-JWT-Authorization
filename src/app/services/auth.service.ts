@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import {tap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {User} from '../user';
 
 @Injectable()
@@ -14,9 +14,15 @@ private userSubject: BehaviorSubject<User>;
     this.currentUser = this.userSubject.asObservable();
   }
 
+  public get currentUserValue(): User {
+        return this.userSubject.value;
+  }
+
   login(email:string, password:string) {
-    return this.httpClient.post<any>('http://www.your-server.com/auth/login', {email, password}).pipe(tap(res => {
-    localStorage.setItem('access_token', res.access_token);
-}))
-}
+    return this.httpClient.post<any>('http://www.your-server.com/auth/login', {email, password}).pipe(map(user => {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                this.userSubject.next(user);
+                return user;
+            }));
+    }
 }
